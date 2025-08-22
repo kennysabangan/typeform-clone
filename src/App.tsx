@@ -1,11 +1,14 @@
-import MyForm from './components/MyForm';
-import FormContextProvider from './context/FormContextProvider';
+import MyForm from "./components/MyForm";
+import FormContextProvider from "./context/FormContextProvider";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   return (
-    <FormContextProvider>
-      <MyForm />
-    </FormContextProvider>
+    <ErrorBoundary>
+      <FormContextProvider>
+        <MyForm />
+      </FormContextProvider>
+    </ErrorBoundary>
   );
 }
 

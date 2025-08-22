@@ -1,24 +1,16 @@
-//  I realised how complex it can get as the project gets bigger and bigger. Something you may not have noticed beforehand, that is now causing an issue, has caused me to redesign my whole logic e.g my array update logic for certain questions as some users may skip a few questions and complete the later ones.
-
-// TODO
-// upload state for resume
-// dont allow submission until all values have been filled
-//  -- add submit validation, if required parts are not filled -> throw error
-
-// disallow moving to next screen if question is required
-// BUG If form is not done in order then there will be issues tracking question answers and its default values.
-// //Possible fix: ADD A GLOBAL ERRORS AND IF THE ERROR EXISTS THEN STOP OTHERWISE CONTINUE BUT ITS NOT WORKING
-//  // I want it so that if the next button is clicked just click the actual button to start the process again
-
-import Navigation from './Navigation';
-import { useFormContext } from '../context/FormContextProvider';
-import { AnimatePresence } from 'framer-motion';
-import Home from './Home';
-import InputQuestion from './InputQuestion';
-import TextAreaQuestion from './TextAreaQuestion';
-import ResumeQuestion from './ResumeQuestion';
-import Results from './Results';
-import ProgressBar from './ProgressBar';
+import React from "react";
+import Navigation from "./Navigation";
+import { useFormContext } from "../context/FormContextProvider";
+import { AnimatePresence } from "framer-motion";
+import Home from "./Home";
+import InputQuestion from "./InputQuestion";
+import NameQuestion from "./NameQuestion";
+import TextAreaQuestion from "./TextAreaQuestion";
+import SelectQuestion from "./SelectQuestion";
+import RadioQuestion from "./RadioQuestion";
+import Results from "./Results";
+import ProgressBar from "./ProgressBar";
+import StartOverButton from "./StartOverButton";
 
 const MyForm = () => {
   const { tab, formData } = useFormContext();
@@ -27,9 +19,9 @@ const MyForm = () => {
     {
       number: 1,
       page: (
-        <InputQuestion
+        <NameQuestion
           number={1}
-          question={`Let's get started. What's your Full Name? *`}
+          question={`Let's get started. What is your name?`}
           key={1}
         />
       ),
@@ -40,7 +32,7 @@ const MyForm = () => {
         <InputQuestion
           number={2}
           question={`Thanks ${
-            formData[0]?.Q1?.split(' ')[0] ?? ''
+            formData.firstName ? formData.firstName : ""
           }. What's your email address?`}
           key={2}
         />
@@ -49,9 +41,16 @@ const MyForm = () => {
     {
       number: 3,
       page: (
-        <InputQuestion
+        <TextAreaQuestion
           number={3}
-          question={`And your mobile number? *`}
+          question={
+            <>
+              What do you want to use the{" "}
+              <span className="question__highlight">$1,000 a month</span> for? *
+            </>
+          }
+          subtitle="Describe your principle goal."
+          buttonText="Continue"
           key={3}
         />
       ),
@@ -59,10 +58,15 @@ const MyForm = () => {
     {
       number: 4,
       page: (
-        <TextAreaQuestion
+        <SelectQuestion
           number={4}
-          question={`In a sentence or two, briefly tell us about yourself and why you'd like
-        to work for Someone`}
+          question={
+            <>
+              In which <span className="question__highlight">U.S. State</span>{" "}
+              is your Legal Residence? *
+            </>
+          }
+          subtitle="The EL3VN Program does not require any upfront investment. However, for individuals residing in certain states, there may be additional fees that exceed our standard reimbursement."
           key={4}
         />
       ),
@@ -70,9 +74,15 @@ const MyForm = () => {
     {
       number: 5,
       page: (
-        <TextAreaQuestion
+        <RadioQuestion
           number={5}
-          question={`Tell us about your experience and why you're suited for this role`}
+          question={
+            <>
+              About where is your{" "}
+              <span className="question__highlight">Credit Score</span> today? *
+            </>
+          }
+          options={["Over 650", "Around 620-650", "Under 620"]}
           key={5}
         />
       ),
@@ -80,25 +90,61 @@ const MyForm = () => {
     {
       number: 6,
       page: (
-        <TextAreaQuestion
+        <RadioQuestion
           number={6}
-          question={`If you have an online portfolio or Github to share, please link to it
-          here`}
+          question={
+            <>
+              Do you have a{" "}
+              <span className="question__highlight">
+                Merchant Processing Account
+              </span>
+              ? *
+            </>
+          }
+          subtitle="A formal account that lets your business accept credit/debit cards directly. Stripe, Shopify, Wix, PayPal don't count."
+          options={["Yes", "No"]}
           key={6}
         />
       ),
     },
     {
       number: 7,
-      page: <ResumeQuestion number={7} key={7} />,
+      page: (
+        <RadioQuestion
+          number={7}
+          question={
+            <>
+              Do you have any{" "}
+              <span className="question__highlight">
+                Active Debt Collections
+              </span>{" "}
+              or are you on{" "}
+              <span className="question__highlight">Government Assistance</span>
+              ? *
+            </>
+          }
+          subtitle="(Welfare, Food Stamps, etc.)"
+          options={["Yes", "No"]}
+          key={7}
+        />
+      ),
     },
     {
       number: 8,
       page: (
-        <TextAreaQuestion
+        <RadioQuestion
           number={8}
-          question={`If not already included in your portfolio or CV, please share 3-4
-          examples of your recent work (include URLs)`}
+          question={
+            <>
+              Do you have a{" "}
+              <span className="question__highlight">Utility Bill</span>{" "}
+              <em>(or similar)</em> that matches your place of residence shown
+              on your{" "}
+              <span className="question__highlight">Driver's License</span>? *
+            </>
+          }
+          subtitle="(Electric, Phone Bill, Renters Insurance, Lease Agreement, Voter Registration)"
+          options={["Yes", "No"]}
           key={8}
         />
       ),
@@ -108,9 +154,10 @@ const MyForm = () => {
       page: (
         <TextAreaQuestion
           number={9}
-          question={`That's all we need for now. Anything else we should know?`}
-          buttonText={'Submit'}
-          helperText={'Ctrl + Enter ↵'}
+          question={`Did someone refer you to EL3VN?`}
+          subtitle="Hit Continue to SKIP"
+          buttonText={"Continue"}
+          helperText={"Enter"}
           key={9}
         />
       ),
@@ -118,19 +165,49 @@ const MyForm = () => {
     {
       number: 10,
       page: (
-        <Results
-          resultPara={`Thanks ${
-            formData[0]?.Q1?.split(' ')[0] ?? ''
-          }. we'll be in touch.`}
+        <InputQuestion
+          number={10}
+          question={`Lastly, what's your Phone Number?`}
+          subtitle="By providing your phone number, you consent to receive communications via call or text."
           key={10}
+        />
+      ),
+    },
+    {
+      number: 11,
+      page: (
+        <RadioQuestion
+          number={11}
+          question={
+            <>
+              Do you consent to receive communications via{" "}
+              <span className="question__highlight">Email</span>? *
+            </>
+          }
+          subtitle="We do not sell your data. We'll be sending information regarding the program."
+          options={["Yes", "No"]}
+          buttonText="Submit and Complete"
+          key={11}
+        />
+      ),
+    },
+    {
+      number: 12,
+      page: (
+        <Results
+          resultPara={`Thank you for taking the time to complete your application${
+            formData.firstName ? `, ${formData.firstName}` : ""
+          }. We've received your information and will review it carefully. You can expect to hear back from us within the next few business days.`}
+          key={12}
         />
       ),
     },
   ];
 
   return (
-    <div className='container'>
+    <div className="container">
       <ProgressBar />
+      <StartOverButton />
       <Navigation />
       <AnimatePresence exitBeforeEnter={true}>
         {pages.map((item) => {

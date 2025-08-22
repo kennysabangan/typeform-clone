@@ -12,34 +12,38 @@ const Q2schema = yup.object().shape({
 });
 
 const Q3schema = yup.object().shape({
-  Q3: yup
-    .number()
-    .typeError('Please enter numbers only')
-    .min(1, 'Please enter a valid number')
-    .required('A phone number is required'),
+  Q3: yup.string().required('Please describe your goal'),
 });
 
 const Q4schema = yup.object().shape({
-  Q4: yup.string(),
+  Q4: yup.string().required('Please select your state'),
 });
 
 const Q5schema = yup.object().shape({
-  Q5: yup.string().required('A response is required'),
+  Q5: yup.string().required('Please select your credit score range'),
 });
 
 const Q6schema = yup.object().shape({
-  Q6: yup.string(),
+  Q6: yup.string().required('Please select an option'),
 });
 
 const Q7schema = yup.object().shape({
-  Q7: yup.string(),
+  Q7: yup.string().required('Please select an option'),
 });
 
 const Q8schema = yup.object().shape({
-  Q9: yup.string(),
+  Q8: yup.string().required('Please select an option'),
 });
 const Q9schema = yup.object().shape({
   Q9: yup.string(),
+});
+
+const Q10schema = yup.object().shape({
+  Q10: yup.string(), // Optional now
+});
+
+const Q11schema = yup.object().shape({
+  Q11: yup.string().required('Please select an option'),
 });
 
 export const schemaSelector = (questionNumber: number): any => {
@@ -61,5 +65,9 @@ export const schemaSelector = (questionNumber: number): any => {
     return Q8schema;
   } else if (questionNumber === 9) {
     return Q9schema;
+  } else if (questionNumber === 10) {
+    return Q10schema;
+  } else if (questionNumber === 11) {
+    return Q11schema;
   }
 };
