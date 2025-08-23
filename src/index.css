@@ -598,7 +598,8 @@ input, textarea {
   .button {
     font-size: 0.9375rem;
     padding: var(--spacing) var(--spacing-md);
-    max-width: 180px;
+    max-width: 220px;
+    white-space: nowrap;
   }
 }
 
@@ -1026,8 +1027,9 @@ kbd {
   .button {
     min-height: 48px; /* Better touch target */
     font-size: 1rem;
-    max-width: 200px; /* Make continue button smaller */
+    max-width: 240px; /* Increased to fit "Submit and Complete" */
     padding: var(--spacing) var(--spacing-lg);
+    white-space: nowrap;
   }
 
   .button__helper {
@@ -1081,8 +1083,9 @@ kbd {
   .button {
     padding: var(--spacing) var(--spacing-md);
     min-height: 44px;
-    max-width: 180px; /* Even smaller on mobile */
+    max-width: 220px; /* Increased to fit "Submit and Complete" */
     font-size: 0.9375rem;
+    white-space: nowrap;
   }
 
   .button__helper {

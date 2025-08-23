@@ -60,25 +60,6 @@ const Results = ({ resultPara }: { resultPara: string }) => {
                 )}
                 !
               </span>
-              {/* Test button positioned inline with name */}
-              <motion.button
-                className="button test-button-inline"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  // Go back to Question 11 for testing without clearing data
-                  setTab(11);
-                }}
-                style={{
-                  backgroundColor: "#10b981",
-                  borderColor: "#10b981",
-                  fontSize: "0.875rem",
-                  padding: "0.5rem 1rem",
-                  verticalAlign: "middle",
-                }}
-              >
-                <span>🧪 Test Resubmit</span>
-              </motion.button>
             </h1>
 
             <div className="results__description">
@@ -101,6 +82,25 @@ const Results = ({ resultPara }: { resultPara: string }) => {
             ></div>
           </div>
         </div>
+        {/* Test button positioned inline with name */}
+        <motion.button
+          className="button test-button-inline"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            // Go back to Question 11 for testing without clearing data
+            setTab(11);
+          }}
+          style={{
+            backgroundColor: "#10b981",
+            borderColor: "#10b981",
+            fontSize: "0.875rem",
+            padding: "0.5rem 1rem",
+            verticalAlign: "middle",
+          }}
+        >
+          <span>👈 Go Back & Resubmit</span>
+        </motion.button>
       </motion.div>
     </motion.div>
   );
