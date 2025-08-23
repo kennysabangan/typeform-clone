@@ -322,11 +322,11 @@ const FormContextProvider = ({ children }: ProviderProps) => {
     try {
       console.log("Submitting form data:", formData);
       console.log(
-        "Webhook URL: https://scalesolving.app.n8n.cloud/webhook-test/0d895cef-4a07-4d11-a0f4-75e94f2d71a6"
+        "Webhook URL: https://scalesolving.app.n8n.cloud/webhook/0d895cef-4a07-4d11-a0f4-75e94f2d71a6"
       );
 
       const response = await fetch(
-        "https://scalesolving.app.n8n.cloud/webhook-test/0d895cef-4a07-4d11-a0f4-75e94f2d71a6",
+        "https://scalesolving.app.n8n.cloud/webhook/0d895cef-4a07-4d11-a0f4-75e94f2d71a6",
         {
           method: "POST",
           headers: {
