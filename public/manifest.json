@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "EL3VN",
+  "name": "EL3VN Intro Call - Passive Income Opportunity",
+  "description": "Schedule your 20-minute EL3VN Intro Call and get information on earning up to $1,000/month in passive income.",
   "icons": [
     {
       "src": "favicon.webp",
@@ -20,6 +21,7 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#6366f1",
+  "background_color": "#ffffff",
+  "categories": ["finance", "business", "productivity"]
 }
