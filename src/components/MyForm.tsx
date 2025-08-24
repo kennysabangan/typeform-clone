@@ -82,7 +82,7 @@ const MyForm = () => {
               <span className="question__highlight">Credit Score</span> today? *
             </>
           }
-          options={["Over 650", "Around 620-650", "Under 620"]}
+          options={["Over 680", "Around 620-680", "Under 620"]}
           key={5}
         />
       ),
@@ -116,7 +116,7 @@ const MyForm = () => {
             <>
               Do you have any{" "}
               <span className="question__highlight">
-                Active Debt Collections
+                Active Debt Collections, Judgments, Liens
               </span>{" "}
               or are you on{" "}
               <span className="question__highlight">Government Assistance</span>
@@ -154,7 +154,7 @@ const MyForm = () => {
       page: (
         <TextAreaQuestion
           number={9}
-          question={`Did someone refer you to EL3VN?`}
+          question={`Who referred you to EL3VN?`}
           subtitle="Hit Continue to SKIP"
           buttonText={"Continue"}
           helperText={"Enter"}

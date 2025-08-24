@@ -12,6 +12,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { schemaSelector } from "../data/schema";
 import ErrorImg from "../assets/ErrorImg";
+import WarningModal from "./WarningModal";
+import { getWarningForAnswer } from "../utils/warningTriggers";
 
 interface Props {
   number: number;
@@ -30,6 +32,10 @@ const RadioQuestion = ({
 }: Props) => {
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [selectedOption, setSelectedOption] = useState("");
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [pendingSubmission, setPendingSubmission] = useState<string | null>(
+    null
+  );
 
   const {
     formData,
@@ -100,6 +106,30 @@ const RadioQuestion = ({
       console.log(
         `Question ${number}: Submitting field "${field}" with value "${value}"`
       );
+
+      // Check if this answer triggers a warning
+      const warningTrigger = getWarningForAnswer(number, value);
+
+      if (warningTrigger) {
+        // Show warning modal and store the pending submission
+        setPendingSubmission(value);
+        setShowWarningModal(true);
+        return;
+      }
+
+      // Proceed with normal submission
+      await proceedWithSubmission(value);
+    } else {
+      console.log(
+        `Question ${number}: No field mapping found, proceeding anyway`
+      );
+      handleClickForward();
+    }
+  };
+
+  const proceedWithSubmission = async (value: string) => {
+    const field = getFieldForQuestion(number);
+    if (field) {
       updateFormData(field, value);
 
       // For Question 11 (final submission), send webhook before proceeding
@@ -110,12 +140,21 @@ const RadioQuestion = ({
 
       // Pass the updated data directly to handleClickForward to avoid race condition
       handleClickForward({ [field]: value });
-    } else {
-      console.log(
-        `Question ${number}: No field mapping found, proceeding anyway`
-      );
-      handleClickForward();
     }
+  };
+
+  const handleWarningContinue = async () => {
+    setShowWarningModal(false);
+    if (pendingSubmission) {
+      await proceedWithSubmission(pendingSubmission);
+      setPendingSubmission(null);
+    }
+  };
+
+  const handleWarningClose = () => {
+    setShowWarningModal(false);
+    setPendingSubmission(null);
+    // User can change their answer
   };
 
   const handleOptionSelect = (option: string) => {
@@ -211,6 +250,19 @@ const RadioQuestion = ({
           </motion.div>
         </motion.form>
       </motion.div>
+
+      {/* Warning Modal */}
+      <WarningModal
+        isOpen={showWarningModal}
+        onClose={handleWarningClose}
+        onContinue={handleWarningContinue}
+        title={
+          getWarningForAnswer(number, pendingSubmission || "")?.title || ""
+        }
+        message={
+          getWarningForAnswer(number, pendingSubmission || "")?.message || ""
+        }
+      />
     </motion.main>
   );
 };
