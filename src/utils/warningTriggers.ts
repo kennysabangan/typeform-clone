@@ -16,7 +16,7 @@ export const warningTriggers: WarningTrigger[] = [
     questionNumber: 6, // Merchant Processing Account
     triggerAnswers: ["Yes"],
     title: "Merchant Account Requirement",
-    message: "This question is a strict requirement by the bank. Not having a Merchant Processing Account may affect your ability to join the program. Please acknowledge that this may impact your eligibility."
+    message: "Not having a Merchant Processing Account is a requirement for the program. Having a pre-existing Merchant Processing Account may affect your ability to join. Please acknowledge that this may impact your eligibility."
   },
   {
     questionNumber: 7, // Debt Collections
