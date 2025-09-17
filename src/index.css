@@ -14,7 +14,7 @@ html {
   touch-action: manipulation;
 }
 
-html, body {
+html {
   height: 100%;
   /* Prevent mobile zoom issues */
   -webkit-text-size-adjust: 100%;
@@ -25,6 +25,7 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
+  height: 100vh; /* Always 100vh for mobile users */
   overflow-x: hidden;
 }
 
@@ -389,7 +390,8 @@ input, textarea, select {
 /* Layout */
 .container {
   position: relative;
-  min-height: 100vh;
+  height: 100vh; /* Exactly 100vh - no scrolling allowed */
+  overflow: hidden; /* Prevent any overflow from content inside */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1012,6 +1014,8 @@ kbd {
     padding-top: 70px; /* Space for progress bar and step indicator */
     padding-bottom: 80px; /* Space for navigation */
     justify-content: center;
+    height: 100vh; /* Exactly 100vh - no scrolling allowed */
+    overflow: hidden; /* Prevent any overflow from content inside */
   }
 
   /* Remove container padding when showing results */
@@ -1072,6 +1076,8 @@ kbd {
     padding-top: 80px; /* Space for progress bar and step indicator */
     padding-bottom: 70px; /* Space for navigation */
     justify-content: center;
+    height: 100vh; /* Exactly 100vh - no scrolling allowed */
+    overflow: hidden; /* Prevent any overflow from content inside */
   }
 
   /* Remove container padding when showing results */
