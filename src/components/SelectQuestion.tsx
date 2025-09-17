@@ -219,6 +219,7 @@ const SelectQuestion = ({
               className="select-input"
               placeholder="Type or select an option"
               autoComplete={getAutocompleteForQuestion(number)}
+              inputMode="none"
             />
             <button
               type="button"

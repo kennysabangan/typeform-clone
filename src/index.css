@@ -14,16 +14,26 @@ html {
   touch-action: manipulation;
 }
 
+html, body {
+  height: 100%;
+  /* Prevent mobile zoom issues */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100vh;
   overflow-x: hidden;
 }
 
-input, textarea {
+input, textarea, select {
   outline: none;
+  /* Prevent mobile zoom on focus */
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-appearance: none;
 }
 
 :root {
@@ -695,6 +705,7 @@ kbd {
   position: relative;
   width: 100%;
   margin: var(--spacing) 0 var(--spacing-xl) 0;
+  touch-action: manipulation;
 }
 
 .select-input {
@@ -737,6 +748,7 @@ kbd {
   align-items: center;
   justify-content: center;
   transition: color 0.2s ease;
+  touch-action: manipulation;
 }
 
 .select-dropdown-button:hover {
@@ -801,6 +813,7 @@ kbd {
   font-size: 1rem;
   transition: background-color 0.2s ease;
   border-bottom: 1px solid var(--gray-100);
+  touch-action: manipulation;
 }
 
 .select-option:last-child {
@@ -840,7 +853,7 @@ kbd {
 
 @media (max-width: 768px) {
   .select-input {
-    font-size: 1.5rem;
+    font-size: 1rem; /* Prevent zoom on iOS */
     height: 50px;
   }
 

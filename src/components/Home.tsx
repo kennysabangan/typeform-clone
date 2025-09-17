@@ -95,11 +95,12 @@ const Home = () => {
         </motion.figure>
 
         <motion.div variants={itemVariants} className="home__text">
-          <h1 className="title">Set Up Your EL3VN Intro Call</h1>
+          <h1 className="title">Get Started with EL3VN</h1>
           <p className="home__subtitle">
-            Set up a time that works for you. This is not a sales call - we will
-            not sell you on anything. We’ll confirm a few basic questions, show
-            you how the program works and answer any questions you may have.
+            There are hard requirements for the program. If you qualify, set up
+            a time for an Intro Call that works for you. This is not a sales
+            call. We’ll confirm a few basic questions, show you how the program
+            works and answer any questions you may have.
           </p>
         </motion.div>
 
