@@ -12,10 +12,6 @@ html {
   scroll-behavior: smooth;
   /* Prevent zoom on double-tap on mobile */
   touch-action: manipulation;
-}
-
-html {
-  height: 100%;
   /* Prevent mobile zoom issues */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -26,12 +22,8 @@ body {
   padding: 0;
   width: 100%;
   height: 100vh;
-  height: calc(var(--vh, 1vh) * 100);
+  max-height: var(--max-vh, 100vh);
   overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
 }
 
 input, textarea, select {
@@ -396,7 +388,7 @@ input, textarea, select {
 .container {
   position: relative;
   height: 100vh;
-  height: calc(var(--vh, 1vh) * 100);
+  max-height: var(--max-vh, 100vh);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1018,7 +1010,7 @@ kbd {
     padding-bottom: 80px; /* Space for navigation */
     justify-content: center;
     height: 100vh;
-    height: calc(var(--vh, 1vh) * 100);
+    max-height: var(--max-vh, 100vh);
     overflow: hidden;
   }
 
@@ -1081,7 +1073,7 @@ kbd {
     padding-bottom: 70px; /* Space for navigation */
     justify-content: center;
     height: 100vh;
-    height: calc(var(--vh, 1vh) * 100);
+    max-height: var(--max-vh, 100vh);
     overflow: hidden;
   }
 
