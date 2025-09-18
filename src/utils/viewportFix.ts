@@ -2,49 +2,56 @@
 // Ensures the app stays within the initial viewport height
 
 export const setViewportHeight = () => {
-  // Get the initial viewport height
-  const initialViewportHeight = window.innerHeight;
+  // Set initial viewport height immediately
+  const setInitialHeight = () => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
 
-  // Set CSS custom property with the initial height
-  document.documentElement.style.setProperty('--initial-vh', `${initialViewportHeight}px`);
-
-  // Update on resize (but only if the height increases, not decreases)
-  // This prevents the height from shrinking when keyboard disappears
-  let maxHeight = initialViewportHeight;
-
-  const updateViewportHeight = () => {
-    const currentHeight = window.innerHeight;
-    if (currentHeight > maxHeight) {
-      maxHeight = currentHeight;
-      document.documentElement.style.setProperty('--initial-vh', `${maxHeight}px`);
-    }
+    // Also set the full height
+    const fullHeight = window.innerHeight;
+    document.documentElement.style.setProperty('--initial-vh', `${fullHeight}px`);
   };
 
-  window.addEventListener('resize', updateViewportHeight);
-  window.addEventListener('orientationchange', updateViewportHeight);
+  // Set initial height
+  setInitialHeight();
+
+  // For iOS Safari, we need to handle this differently
+  // Only update the height if the window actually resized (not just keyboard)
+  let initialHeight = window.innerHeight;
+  let timeoutId: number;
+
+  const handleResize = () => {
+    // Clear any existing timeout
+    clearTimeout(timeoutId);
+
+    // Debounce the resize event
+    timeoutId = window.setTimeout(() => {
+      const currentHeight = window.innerHeight;
+
+      // Only update if the height increased significantly (orientation change)
+      // Don't update for keyboard showing/hiding
+      if (currentHeight > initialHeight * 1.1) {
+        initialHeight = currentHeight;
+        setInitialHeight();
+      }
+    }, 150);
+  };
+
+  // Handle orientation changes properly
+  const handleOrientationChange = () => {
+    // Wait for the orientation change to complete
+    setTimeout(() => {
+      initialHeight = window.innerHeight;
+      setInitialHeight();
+    }, 500);
+  };
+
+  window.addEventListener('resize', handleResize);
+  window.addEventListener('orientationchange', handleOrientationChange);
 
   return () => {
-    window.removeEventListener('resize', updateViewportHeight);
-    window.removeEventListener('orientationchange', updateViewportHeight);
+    clearTimeout(timeoutId);
+    window.removeEventListener('resize', handleResize);
+    window.removeEventListener('orientationchange', handleOrientationChange);
   };
-};
-
-// Alternative approach: Use the visual viewport API if available
-export const useVisualViewport = () => {
-  if (window.visualViewport) {
-    const updateHeight = () => {
-      const height = window.visualViewport!.height;
-      document.documentElement.style.setProperty('--viewport-height', `${height}px`);
-    };
-
-    window.visualViewport.addEventListener('resize', updateHeight);
-    updateHeight(); // Set initial value
-
-    return () => {
-      window.visualViewport!.removeEventListener('resize', updateHeight);
-    };
-  }
-
-  // Fallback to regular viewport
-  return setViewportHeight();
 };
