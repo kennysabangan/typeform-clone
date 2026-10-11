@@ -180,6 +180,7 @@ const FormContextProvider = ({ children }: ProviderProps) => {
   };
 
   // Find the first incomplete required question
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const findFirstIncompleteQuestion = (): number => {
     for (let i = 1; i <= 11; i++) {
       const requiredFields = getRequiredFieldsForQuestion(i);
