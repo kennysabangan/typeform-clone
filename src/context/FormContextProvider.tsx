@@ -206,25 +206,6 @@ const FormContextProvider = ({ children }: ProviderProps) => {
     }
   };
 
-  // Check if all required fields for a question are filled
-  const isQuestionComplete = (questionNumber: number): boolean => {
-    const requiredFields = getRequiredFieldsForQuestion(questionNumber);
-    return requiredFields.every(
-      (field) => formData[field] && formData[field].trim() !== ""
-    );
-  };
-
-  // Find the first incomplete required question
-  const findFirstIncompleteQuestion = (): number => {
-    for (let i = 1; i <= 11; i++) {
-      const requiredFields = getRequiredFieldsForQuestion(i);
-      if (requiredFields.length > 0 && !isQuestionComplete(i)) {
-        return i;
-      }
-    }
-    return -1; // All required questions are complete
-  };
-
   const handleClickForward = useCallback(
     (updatedFormData?: Partial<FormData>) => {
       // Prevent multiple rapid submissions
