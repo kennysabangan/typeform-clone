@@ -43,6 +43,41 @@ export interface ProviderProps {
 
 const FormContext = createContext<ContextProps | {}>({});
 
+// EL3VN CRM (app.el3vn.io): every submission also creates/updates a lead there.
+const CRM_LEAD_URL = "https://app.el3vn.io/api/crm/lead";
+
+const sendToCrm = async (data: FormData) => {
+  try {
+    const response = await fetch(CRM_LEAD_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        email: data.email,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        phone: data.phone,
+        answers: {
+          "What do you want to use the $1,000 a month for?": data.goalFor1000,
+          "U.S. State of legal residence": data.usState,
+          "Credit score": data.creditScore,
+          "Merchant processing account": data.merchantAccount,
+          "Debt collections, judgments, liens or government assistance": data.debtCollections,
+          "Utility bill matching driver's license address": data.utilityBill,
+          "Referred by": data.referral,
+          "Consents to email": data.emailConsent,
+        },
+        page: window.location.href,
+        website: "", // spam trap, must stay empty
+      }),
+    });
+    if (!response.ok) console.error("CRM lead failed:", response.status, await response.text());
+  } catch (error) {
+    // Never block the form on the CRM.
+    console.error("CRM lead error:", error);
+  }
+};
+
 // Constants for localStorage keys
 const FORM_DATA_KEY = "el3vn_form_data";
 const FORM_TAB_KEY = "el3vn_form_tab";
@@ -319,6 +354,8 @@ const FormContextProvider = ({ children }: ProviderProps) => {
 
   // Submit form data to webhook
   const submitFormData = useCallback(async (): Promise<void> => {
+    // Runs alongside the n8n webhook below; neither waits on the other.
+    const crm = sendToCrm(formData);
     try {
       console.log("Submitting form data:", formData);
       console.log(
@@ -359,6 +396,7 @@ const FormContextProvider = ({ children }: ProviderProps) => {
 
       // Don't throw error to prevent blocking the UI
     }
+    await crm;
   }, [formData]);
 
   return (
