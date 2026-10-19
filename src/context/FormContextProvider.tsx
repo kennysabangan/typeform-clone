@@ -34,7 +34,8 @@ export interface ContextProps {
   globalErrors: any;
   setGlobalErrors: any;
   clearFormData: () => void;
-  submitFormData: () => Promise<void>;
+  submitFormData: (updatedFormData?: Partial<FormData>) => Promise<void>;
+  sendBookingToCrm: (inviteeUri: string) => void;
 }
 
 export interface ProviderProps {
@@ -43,21 +44,27 @@ export interface ProviderProps {
 
 const FormContext = createContext<ContextProps | {}>({});
 
-// EL3VN CRM (app.el3vn.io): every submission also creates/updates a lead there.
+// EL3VN CRM (app.el3vn.io): leads land there at three moments.
+//  started:   they typed their email (so drop-offs can be followed up)
+//  submitted: they answered the last question
+//  booked:    they booked the intro call in the Calendly widget on the results page
 const CRM_LEAD_URL = "https://app.el3vn.io/api/crm/lead";
 
-const sendToCrm = async (data: FormData) => {
+type CrmEvent = "started" | "submitted" | "booked";
+
+const sendToCrm = async (data: FormData, event: CrmEvent, extra: Record<string, unknown> = {}) => {
   try {
     const response = await fetch(CRM_LEAD_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       keepalive: true,
       body: JSON.stringify({
+        event,
         email: data.email,
         first_name: data.firstName,
         last_name: data.lastName,
-        phone: data.phone,
-        answers: {
+        phone: data.phone === "None" ? "" : data.phone,
+        answers: event !== "submitted" ? {} : {
           "What do you want to use the $1,000 a month for?": data.goalFor1000,
           "U.S. State of legal residence": data.usState,
           "Credit score": data.creditScore,
@@ -69,6 +76,7 @@ const sendToCrm = async (data: FormData) => {
         },
         page: window.location.href,
         website: "", // spam trap, must stay empty
+        ...extra,
       }),
     });
     if (!response.ok) console.error("CRM lead failed:", response.status, await response.text());
@@ -266,6 +274,11 @@ const FormContextProvider = ({ children }: ProviderProps) => {
         return -1; // All required questions are complete
       };
 
+      // They just entered their email: add them to the CRM now, in case they don't finish.
+      if (updatedFormData?.email && !dataToCheck.emailConsent) {
+        sendToCrm(dataToCheck, "started");
+      }
+
       const firstIncomplete = findFirstIncompleteQuestionWithData(dataToCheck);
 
       if (firstIncomplete !== -1) {
@@ -333,12 +346,13 @@ const FormContextProvider = ({ children }: ProviderProps) => {
     }
   }, [clearFormData]);
 
-  // Submit form data to webhook
-  const submitFormData = useCallback(async (): Promise<void> => {
+  // Submit form data to webhook. The last answer is passed in because its state update hasn't landed yet.
+  const submitFormData = useCallback(async (updatedFormData?: Partial<FormData>): Promise<void> => {
+    const data = { ...formData, ...updatedFormData };
     // Runs alongside the n8n webhook below; neither waits on the other.
-    const crm = sendToCrm(formData);
+    const crm = sendToCrm(data, "submitted");
     try {
-      console.log("Submitting form data:", formData);
+      console.log("Submitting form data:", data);
       console.log(
         "Webhook URL: https://scalesolving.app.n8n.cloud/webhook/0d895cef-4a07-4d11-a0f4-75e94f2d71a6"
       );
@@ -350,7 +364,7 @@ const FormContextProvider = ({ children }: ProviderProps) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(data),
         }
       );
 
@@ -380,6 +394,13 @@ const FormContextProvider = ({ children }: ProviderProps) => {
     await crm;
   }, [formData]);
 
+  const sendBookingToCrm = useCallback(
+    (inviteeUri: string) => {
+      sendToCrm(formData, "booked", { calendly: { invitee_uri: inviteeUri } });
+    },
+    [formData]
+  );
+
   return (
     <FormContext.Provider
       value={{
@@ -394,6 +415,7 @@ const FormContextProvider = ({ children }: ProviderProps) => {
         setGlobalErrors,
         clearFormData,
         submitFormData,
+        sendBookingToCrm,
       }}
     >
       {children}

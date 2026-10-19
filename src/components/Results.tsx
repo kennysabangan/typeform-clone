@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useFormContext } from "../context/FormContextProvider";
 import {
   pageVariants,
@@ -8,8 +8,33 @@ import {
 } from "../data/variants";
 
 const Results = ({ resultPara }: { resultPara: string }) => {
-  const { formData, setTab } = useFormContext();
+  const { formData, setTab, sendBookingToCrm } = useFormContext();
   console.log(formData);
+
+  // Prefill Calendly so the booking lands on the same CRM contact as the form.
+  const calendlyParams = new URLSearchParams({
+    hide_event_type_details: "1",
+    hide_gdpr_banner: "1",
+    name: `${formData.firstName} ${formData.lastName}`.trim(),
+    email: formData.email,
+  });
+  const calendlyUrl = `https://calendly.com/el3vn-team/el3vn-intro-call-20-min?${calendlyParams
+    .toString()
+    .replace(/\+/g, "%20")}`;
+
+  // Calendly tells the page when they book; pass it to the CRM (once per booking).
+  const reportedBookings = useRef(new Set<string>());
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.origin !== "https://calendly.com" || e.data?.event !== "calendly.event_scheduled") return;
+      const inviteeUri = e.data.payload?.invitee?.uri;
+      if (typeof inviteeUri !== "string" || reportedBookings.current.has(inviteeUri)) return;
+      reportedBookings.current.add(inviteeUri);
+      sendBookingToCrm(inviteeUri);
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [sendBookingToCrm]);
 
   // Load Calendly script
   useEffect(() => {
@@ -74,7 +99,7 @@ const Results = ({ resultPara }: { resultPara: string }) => {
           <div className="results__calendly-column">
             <div
               className="calendly-inline-widget"
-              data-url="https://calendly.com/el3vn-team/el3vn-intro-call-20-min?hide_event_type_details=1&hide_gdpr_banner=1"
+              data-url={calendlyUrl}
               style={{
                 minWidth: "500px",
                 minHeight: "620px",

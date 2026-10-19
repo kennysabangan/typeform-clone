@@ -135,7 +135,7 @@ const RadioQuestion = ({
       // For Question 11 (final submission), send webhook before proceeding
       if (number === 11) {
         console.log("Final submission - sending webhook");
-        await submitFormData();
+        await submitFormData({ [field]: value });
       }
 
       // Pass the updated data directly to handleClickForward to avoid race condition
