@@ -346,53 +346,13 @@ const FormContextProvider = ({ children }: ProviderProps) => {
     }
   }, [clearFormData]);
 
-  // Submit form data to webhook. The last answer is passed in because its state update hasn't landed yet.
-  const submitFormData = useCallback(async (updatedFormData?: Partial<FormData>): Promise<void> => {
-    const data = { ...formData, ...updatedFormData };
-    // Runs alongside the n8n webhook below; neither waits on the other.
-    const crm = sendToCrm(data, "submitted");
-    try {
-      console.log("Submitting form data:", data);
-      console.log(
-        "Webhook URL: https://scalesolving.app.n8n.cloud/webhook/0d895cef-4a07-4d11-a0f4-75e94f2d71a6"
-      );
-
-      const response = await fetch(
-        "https://scalesolving.app.n8n.cloud/webhook/0d895cef-4a07-4d11-a0f4-75e94f2d71a6",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
-
-      console.log("Response status:", response.status);
-      console.log("Response headers:", response.headers);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Response error text:", errorText);
-        throw new Error(
-          `HTTP error! status: ${response.status}, message: ${errorText}`
-        );
-      }
-
-      const responseData = await response.text();
-      console.log("Form data submitted successfully. Response:", responseData);
-    } catch (error) {
-      console.error("Error submitting form data:", error);
-
-      // Log specific error types for debugging
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        console.error("Network error - likely CORS or connectivity issue");
-      }
-
-      // Don't throw error to prevent blocking the UI
-    }
-    await crm;
-  }, [formData]);
+  // Final submit goes to the EL3VN CRM. The last answer is passed in because its state update hasn't landed yet.
+  const submitFormData = useCallback(
+    async (updatedFormData?: Partial<FormData>): Promise<void> => {
+      await sendToCrm({ ...formData, ...updatedFormData }, "submitted");
+    },
+    [formData]
+  );
 
   const sendBookingToCrm = useCallback(
     (inviteeUri: string) => {
